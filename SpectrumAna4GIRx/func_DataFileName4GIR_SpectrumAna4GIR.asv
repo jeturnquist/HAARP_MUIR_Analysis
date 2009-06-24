@@ -1,0 +1,22 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      func_DataFileName4GIR_SpectrumAna4GIR
+%         made by Shin-ichiro Oyama, GI UAF
+%
+%         ver.1.0: 05-Jul-2006
+%
+%         # decide the data-file name (from the GI receiver)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [ DataFileName4GIR ] =                      ...
+             func_DataFileName4GIR_SpectrumAna4GIR(  ...
+             SelDataNum4GIR, SelDataExtNum4GIR )
+%------
+% set global parameter
+%------
+ global_SpectrumAna4GIR;
+ 
+ 
+%------
+% file name

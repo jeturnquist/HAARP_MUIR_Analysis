@@ -136,7 +136,7 @@ CurrentData.PSDinDBArr  = PSDinDBArr;
 %%
 %% Create Frequency Array
 %%
-FitRange = length(PSDArr{1});
+FitRange = size(PSDArr{1},1);
 
 FreqWidth = RadarParam.SamplingRate; %Hz
 TransFreq = RadarParam.TransmitFreq; %Hz
@@ -145,7 +145,7 @@ RecCenterFreq   = RadarParam.ReceivingCenterFrequency(1);  %Hz
 RadarFreq = 446;
 
 % fHF = RecCenterFreq/1e6 - 21;
-fHF = RecCenterFreq/1e6 - 446 - 20 - DCKNOB;
+fHF = RecCenterFreq/1e6 - 446 - 20 + DCKNOB;
 
 CenterFreq = fHF;
 FreqRes = FreqWidth/FitRange;

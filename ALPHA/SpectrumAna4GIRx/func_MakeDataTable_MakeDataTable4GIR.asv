@@ -1,0 +1,65 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      func_MakeDataTable_MakeDataTable4GIR.m
+%          made by Shin-ichiro Oyama, GI UAF
+%
+%          ver.1.0: Jun-27-06
+%
+%          # make data table
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function func_MakeDataTable_MakeDataTable4GIR(             ...
+             DataFileListArr, YearArr, MonthArr, DayArr,   ...
+             HourArr, MinuteArr, SecondArr )
+%------
+% set global parameters
+%------
+ global_MakeDataTable4GIR;
+ 
+ 
+%------
+% prepare the file of the data table
+%------
+%%% file name
+ FileName4DataTable  = [ 'DataTable_', SelDateChar, '.txt' ];
+ FileName4DataTable  = [ DataDirectory, '\', SelDateChar, '\', ...
+                         FileName4DataTable ];
+ 
+ 
+%%% open the file
+ fid   = fopen( FileName4DataTable, 'w' );
+ 
+ 
+%------
+% print information in the file
+%------
+%%% header
+ TmpChar1   = 'file name';
+ TmpChar2   = 'date';
+ TmpChar3   = 'hour';
+ TmpChar4   = 'minute';
+ TmpChar5   = 'second (UT)';
+ fprintf( fid, '%s\t%s\t%s\t%s\t%s\t\n',                      ...
+          TmpChar1, TmpChar2, TmpChar3, TmpChar4, TmpChar5 );
+      
+          
+%%% each data
+ FileNum    = length(DataFileListArr);
+ for Ifile = 1:FileNum
+     %%% select data
+     SelFileName   = DataFileListArr{Ifile};
+     SelYear       = YearArr(Ifile);
+     SelMonth      = MonthArr(Ifile);
+     SelDay        = DayArr(Ifile);
+     SelHour       = HourArr(Ifile);
+     SelMinute     = MinuteArr(Ifile);
+     SelSecond     = SecondArr(Ifile);
+ end%for Ifile
+ 
+ 
+ 
+%------
+% close file
+%------
+ fclose(fid);

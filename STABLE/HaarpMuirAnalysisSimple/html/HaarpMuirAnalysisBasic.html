@@ -1,0 +1,492 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>HaarpMuirAnalysisBasic</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2009-04-27">
+      <meta name="m-file" content="HaarpMuirAnalysisBasic"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#2">User Defined General Paramters</a></li>
+               <li><a href="#4">Initialize Parameter Structures</a></li>
+               <li><a href="#6">Directory path for data</a></li>
+               <li><a href="#8">Set General Analysis Parameters Structure</a></li>
+               <li><a href="#9">Select data files to be analyzed</a></li>
+               <li><a href="#10">Generate File List</a></li>
+               <li><a href="#11">Select file number for analysis</a></li>
+               <li><a href="#12">Time factor for integration</a></li>
+               <li><a href="#13">Parse GenerlaParmaters.txt</a></li>
+               <li><a href="#14">Read timing info from selected *.h5 file</a></li>
+               <li><a href="#15">Spectrum analysis of SRIRx data</a></li>
+            </ul>
+         </div><pre class="codeinput"><span class="comment">% function [SavedData] = HaarpMUIRAnalysis(varargin)</span>
+
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">%</span>
+<span class="comment">%       HaarpMUIRAnalysis.m</span>
+<span class="comment">%           made by J. Turnquist, GI UAF</span>
+<span class="comment">%              much of the code was copied from PlotSNRofHaarpAmisr.m</span>
+<span class="comment">%              and associated files, written by S. Oyama</span>
+<span class="comment">%       ver.1.0: Jun-24-2008</span>
+<span class="comment">%       ver.1.1: Aug-7-2008 :  Added save funcion</span>
+<span class="comment">%       ver.1.2: Aug-14-2008:  Added NoDisplay feature to enable</span>
+<span class="comment">%                               HaarpMUIRAnalysis.m to be run on a headless</span>
+<span class="comment">%                               computer (cluster)</span>
+<span class="comment">%       ver.1.2.1: Aug-21-2008: made small fixes</span>
+<span class="comment">%       ver.1.2.2: Aug-21-2008: made small fixes to PlotSNRandPSD</span>
+<span class="comment">%       ver.1.3:   Dec-11-2008: Fixed timing. No longer uses MatlabTime,</span>
+<span class="comment">%                               now uses RadacTime, time of each individual</span>
+<span class="comment">%                               pulse. There is a time lag (dropped pulses)</span>
+<span class="comment">%                               b/t records.</span>
+<span class="comment">%       ver.1.3.1: Jan-23-2009: Cleaned up code, added comments.</span>
+<span class="comment">%       ver.1.3.2: Jan-29-2009: Added error message for non-existant data</span>
+<span class="comment">%                               directory</span>
+<span class="comment">%       ver.1.3.2: Feb-02-2009: Removed deprecated function</span>
+<span class="comment">%                                global_HaarpAnalysis</span>
+<span class="comment">%       ver.1.3.3: Mar-09-2009: Added new user param: DCKNOB - Down</span>
+<span class="comment">%                                converter knob selection</span>
+<span class="comment">%                               Added ablility to save as .fig</span>
+<span class="comment">%</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+<span class="comment">%------</span>
+<span class="comment">% Check number of input variables</span>
+<span class="comment">%------</span>
+<span class="comment">% if nargin == 2;</span>
+<span class="comment">%     Directory4GeneralParamsAsciiFile = varargin{1};</span>
+<span class="comment">%     SelFileNumInput = varargin{2};</span>
+<span class="comment">% elseif nargin == 1</span>
+<span class="comment">%     Directory4GeneralParamsAsciiFile = varargin{1};</span>
+<span class="comment">% end</span>
+</pre><img vspace="5" hspace="5" src="HaarpMuirAnalysisBasic_01.png"> <h2>User Defined General Paramters<a name="2"></a></h2><pre class="codeinput"><span class="comment">%------</span>
+<span class="comment">% set global parameters</span>
+<span class="comment">%------</span>
+
+<span class="keyword">global</span> NODISPLAY
+<span class="keyword">global</span> RUNFROMSCRIPT
+<span class="keyword">global</span> SAVEBIT
+<span class="keyword">global</span> DCKNOB
+
+NODISPLAY       = 1;    <span class="comment">%% 0 : figure visible on</span>
+                        <span class="comment">%% 1 : figure visible off</span>
+
+RUNFROMSCRIPT   = 0;    <span class="comment">%% 1 : Set eqaul to 1 when calling HaarpMUIRAnalysis</span>
+                        <span class="comment">%%      as a function from from a shell script.</span>
+                        <span class="comment">%%      Used when running HaarpMUIRAnalysis on a cluster.</span>
+                        <span class="comment">%%      See shell script for more info.</span>
+
+SAVEBIT         = 0;    <span class="comment">%% 1 : Store PSD and SNR data in structure SavedData</span>
+                        <span class="comment">%% 0 : Do not store data</span>
+
+
+                        <span class="comment">%% Down converter knob selection (MHz)</span>
+DCKNOB          = 445;  <span class="comment">%% 445 : Ionline</span>
+                        <span class="comment">%% 450 : Downshifted plasma line</span>
+                        <span class="comment">%% 440 : Upshifted plamsa line</span>
+
+
+<span class="comment">% Note:   When running from a shell script, GeneralParameters.txt needs to</span>
+<span class="comment">%       be located in the directory containing the data that will be analyzed.</span>
+<span class="comment">%       GeneralParamaters.txt contains all the variables that would normally be</span>
+<span class="comment">%       inputed at the prompt. A sample GeneralParamaters.txt can be found in</span>
+<span class="comment">%       the root dir of HaarpMuirAnalysis.m</span>
+
+
+SaveFigExt         = <span class="string">'jpg'</span>;         <span class="comment">%% 0   : Do not save figure</span>
+                                    <span class="comment">%% jpg : Save figure as JPG to selected</span>
+                                    <span class="comment">%%        directory</span>
+                                    <span class="comment">%% fig : Save figure as FIG</span>
+                                    <span class="comment">%% eps : Save figure as EPS</span>
+                                    <span class="comment">%% tif : Save figure as TIFF</span>
+                                    <span class="comment">%% pdf  : Save figure as PDF</span>
+                                    <span class="comment">%% See help print for other data</span>
+                                    <span class="comment">%%  formats</span>
+
+PulseType           = <span class="string">'uCLP'</span>;        <span class="comment">%% uCLP : Uncoded Long Pulse</span>
+                                    <span class="comment">%% CLP  : Coded Long Pulse</span>
+</pre><h2>Initialize Parameter Structures<a name="4"></a></h2><pre class="codeinput"> [ InputParam, RadarParam, GenParam ] = func_InitializeStructures;
+
+
+<span class="keyword">if</span> ~RUNFROMSCRIPT
+</pre><pre class="codeoutput">Error: At least one END is missing: the statement may begin here.</pre><h2>Directory path for data<a name="6"></a></h2>
+         <p>NOTE:   The directory path for the MUIR data cannot contain spaces when       running HaarpMuirAnalysis.m on a windows machince.
+            MATLAB uses the       local command line (i.e DOS-prompt in windows). DOS-prompt does not       support spaces in directory
+            names and it is not possible to escape       the spaces (if I am wrong please let me know).         Thus, either place the
+            data in a directory path containing no       spaces or use the windows short name convention.           'C:\Documents and
+            Settings' --&gt; 'C:\DOCUME~1' (short name)
+         </p><pre>       On a *nix system it is possible to escape spaces using a
+     backslash (\).
+          '/PARS summer school 2007' --&gt; '/PARS\ summer\ school\ 2007'</pre><pre class="codeinput"><span class="comment">% Directory4MUIRData =  ...</span>
+<span class="comment">%     'H:\FebMarch08WinterCampaign\SRIIRxData';</span>
+Directory4MUIRData =  <span class="keyword">...</span>
+    <span class="string">'/Volumes/Dragon-100/Oct2008/SRIRx/'</span>
+<span class="comment">%      '/Users/jet/Work/PARS2008/Data/SRIRx/Fallen-Watkins_expt3/'</span>
+<span class="comment">%     '/Users/jet/Work/Campain_Oct2008/SRIRx/';</span>
+
+
+
+
+SelectedDateChar    = <span class="string">'20081028'</span>;
+ExpNumberChar       = <span class="string">'003'</span>;
+
+
+SaveDirectory = <span class="keyword">...</span>
+    <span class="string">'/Volumes/Dragon-100/Oct2008/SRIRx/20081028.003/Analysis/'</span>;
+<span class="comment">%     '/Volumes/Dragon-100/Oct2008/SRIRx/20081026.020/Analysis/';</span>
+<span class="comment">%     '/Users/jet/Work/alpha/Pedersen_20081029/SRIRx/Analysis';</span>
+</pre><h2>Set General Analysis Parameters Structure<a name="8"></a></h2><pre class="codeinput">InputParam = struct(  <span class="string">'Directory4MUIRData'</span>,Directory4MUIRData,      <span class="keyword">...</span>
+                      <span class="string">'SelectedDateChar'</span>, SelectedDateChar,         <span class="keyword">...</span>
+                      <span class="string">'ExpNumberChar'</span>,ExpNumberChar,                <span class="keyword">...</span>
+                      <span class="string">'SaveFigExt'</span>, SaveFigExt,                     <span class="keyword">...</span>
+                      <span class="string">'PulseType'</span>,PulseType,                        <span class="keyword">...</span>
+                      <span class="string">'SaveDirectory'</span>,SaveDirectory);
+</pre><h2>Select data files to be analyzed<a name="9"></a></h2><pre class="codeinput">GenParam.SelectedDirChar = [ InputParam.SelectedDateChar , <span class="string">'.'</span>      <span class="keyword">...</span>
+                           , InputParam.ExpNumberChar ];
+</pre><h2>Generate File List<a name="10"></a></h2><pre class="codeinput">[ GenParam status ] = func_MakeFileNameArr(InputParam, GenParam);
+<span class="keyword">if</span> status &lt; 0, <span class="keyword">return</span>, <span class="keyword">end</span>
+</pre><h2>Select file number for analysis<a name="11"></a></h2><pre class="codeinput">[ GenParam ] = func_SelectFileNumber4Ana(GenParam);
+</pre><h2>Time factor for integration<a name="12"></a></h2><pre class="codeinput">[ GenParam ] = func_SelectAnalysisParameters(GenParam, RadarParam);
+
+
+
+
+<span class="keyword">else</span>
+</pre><h2>Parse GenerlaParmaters.txt<a name="13"></a></h2><pre class="codeinput">    <span class="comment">%%%----------</span>
+    <span class="comment">%%% Set Paramaters from text file GeneralParamaters.txt</span>
+    <span class="comment">%%%----------</span>
+    [ InputParam, status ] = func_InputGeneralAnalysisParameters(       <span class="keyword">...</span>
+                                    Directory4GeneralParamsAsciiFile    <span class="keyword">...</span>
+                                  , InputParam);
+
+    <span class="keyword">if</span> InputParam.DataFileNumbers &lt; 0
+        InputParam.DataFileNumbers = SelFileNumInput;
+    <span class="keyword">end</span>
+
+    <span class="keyword">if</span> status &lt; 0; <span class="keyword">return</span>; <span class="keyword">end</span>
+    <span class="comment">%% Select data files to be analyzed</span>
+    GenParam.SelectedDirChar = [ InputParam.SelectedDateChar , <span class="string">'.'</span>      <span class="keyword">...</span>
+                               , InputParam.ExpNumberChar ];
+
+    <span class="comment">%% Generate File List</span>
+    [ GenParam ] = func_MakeFileNameArr(InputParam, GenParam);
+
+    Fit = [];
+    <span class="keyword">for</span> ii = 1:1:length(InputParam.DataFileNumbers)
+        Fit(ii) = find( GenParam.DataFileNumberArr == <span class="keyword">...</span>
+                            InputParam.DataFileNumbers(ii) );
+    <span class="keyword">end</span>
+
+    GenParam.SelectedFileNames   = GenParam.FileNameArr(Fit);
+    GenParam.SelectedFileNumbers = GenParam.DataFileNumberArr(Fit);
+
+    GenParam.Factor4IntTime = InputParam.Factor4IntTime;
+
+    GenParam.LowerHeight = InputParam.LowerRange;
+    GenParam.UpperHeight = InputParam.UpperRange;
+
+
+<span class="keyword">end</span><span class="comment">%% if ~RunFromScript</span>
+</pre><h2>Read timing info from selected *.h5 file<a name="14"></a></h2><pre class="codeinput">[ RadarParam status] = func_ReadExpSetupFile_hdf5(<span class="keyword">...</span>
+    InputParam, RadarParam, GenParam);
+<span class="keyword">if</span> status &lt; 0, <span class="keyword">return</span>, <span class="keyword">end</span>
+</pre><h2>Spectrum analysis of SRIRx data<a name="15"></a></h2><pre class="codeinput">[ SavedData ] = func_SpectrumAna4SRIRx(GenParam, InputParam, RadarParam);
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+% function [SavedData] = HaarpMUIRAnalysis(varargin)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       HaarpMUIRAnalysis.m
+%           made by J. Turnquist, GI UAF
+%              much of the code was copied from PlotSNRofHaarpAmisr.m
+%              and associated files, written by S. Oyama
+%       ver.1.0: Jun-24-2008
+%       ver.1.1: Aug-7-2008 :  Added save funcion
+%       ver.1.2: Aug-14-2008:  Added NoDisplay feature to enable 
+%                               HaarpMUIRAnalysis.m to be run on a headless
+%                               computer (cluster)
+%       ver.1.2.1: Aug-21-2008: made small fixes
+%       ver.1.2.2: Aug-21-2008: made small fixes to PlotSNRandPSD
+%       ver.1.3:   Dec-11-2008: Fixed timing. No longer uses MatlabTime,
+%                               now uses RadacTime, time of each individual
+%                               pulse. There is a time lag (dropped pulses)
+%                               b/t records.
+%       ver.1.3.1: Jan-23-2009: Cleaned up code, added comments.
+%       ver.1.3.2: Jan-29-2009: Added error message for non-existant data 
+%                               directory
+%       ver.1.3.2: Feb-02-2009: Removed deprecated function
+%                                global_HaarpAnalysis
+%       ver.1.3.3: Mar-09-2009: Added new user param: DCKNOB - Down
+%                                converter knob selection
+%                               Added ablility to save as .fig
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% Check number of input variables
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% if nargin == 2;
+%     Directory4GeneralParamsAsciiFile = varargin{1};
+%     SelFileNumInput = varargin{2};
+% elseif nargin == 1
+%     Directory4GeneralParamsAsciiFile = varargin{1};
+% end
+
+
+%% User Defined General Paramters
+%%
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% set global parameters
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+global NODISPLAY
+global RUNFROMSCRIPT 
+global SAVEBIT
+global DCKNOB
+
+NODISPLAY       = 1;    %% 0 : figure visible on
+                        %% 1 : figure visible off 
+                    
+RUNFROMSCRIPT   = 0;    %% 1 : Set eqaul to 1 when calling HaarpMUIRAnalysis 
+                        %%      as a function from from a shell script. 
+                        %%      Used when running HaarpMUIRAnalysis on a cluster.
+                        %%      See shell script for more info.
+                    
+SAVEBIT         = 0;    %% 1 : Store PSD and SNR data in structure SavedData
+                        %% 0 : Do not store data
+                        
+                        
+                        %% Down converter knob selection (MHz)
+DCKNOB          = 445;  %% 445 : Ionline
+                        %% 450 : Downshifted plasma line 
+                        %% 440 : Upshifted plamsa line
+
+                    
+% Note:   When running from a shell script, GeneralParameters.txt needs to
+%       be located in the directory containing the data that will be analyzed.
+%       GeneralParamaters.txt contains all the variables that would normally be
+%       inputed at the prompt. A sample GeneralParamaters.txt can be found in
+%       the root dir of HaarpMuirAnalysis.m
+       
+
+SaveFigExt         = 'jpg';         %% 0   : Do not save figure
+                                    %% jpg : Save figure as JPG to selected 
+                                    %%        directory
+                                    %% fig : Save figure as FIG 
+                                    %% eps : Save figure as EPS 
+                                    %% tif : Save figure as TIFF
+                                    %% pdf  : Save figure as PDF
+                                    %% See help print for other data 
+                                    %%  formats
+                                    
+PulseType           = 'uCLP';        %% uCLP : Uncoded Long Pulse
+                                    %% CLP  : Coded Long Pulse
+
+%% Initialize Parameter Structures
+%%
+ [ InputParam, RadarParam, GenParam ] = func_InitializeStructures;
+ 
+ 
+if ~RUNFROMSCRIPT 
+ 
+%% Directory path for data      
+%%  
+% NOTE:   The directory path for the MUIR data cannot contain spaces when  
+%       running HaarpMuirAnalysis.m on a windows machince. MATLAB uses the
+%       local command line (i.e DOS-prompt in windows). DOS-prompt does not
+%       support spaces in directory names and it is not possible to escape
+%       the spaces (if I am wrong please let me know). 
+%         Thus, either place the data in a directory path containing no
+%       spaces or use the windows short name convention.
+%           'C:\Documents and Settings' REPLACE_WITH_DASH_DASH> 'C:\DOCUME~1' (short name)
+%
+%         On a *nix system it is possible to escape spaces using a
+%       backslash (\).
+%            '/PARS summer school 2007' REPLACE_WITH_DASH_DASH> '/PARS\ summer\ school\ 2007'
+
+
+% Directory4MUIRData =  ...
+%     'H:\FebMarch08WinterCampaign\SRIIRxData';
+Directory4MUIRData =  ...
+    '/Volumes/Dragon-100/Oct2008/SRIRx/'
+%      '/Users/jet/Work/PARS2008/Data/SRIRx/Fallen-Watkins_expt3/'
+%     '/Users/jet/Work/Campain_Oct2008/SRIRx/';
+
+     
+
+      
+SelectedDateChar    = '20081028';
+ExpNumberChar       = '003';
+
+
+SaveDirectory = ...
+    '/Volumes/Dragon-100/Oct2008/SRIRx/20081028.003/Analysis/';
+%     '/Volumes/Dragon-100/Oct2008/SRIRx/20081026.020/Analysis/';    
+%     '/Users/jet/Work/alpha/Pedersen_20081029/SRIRx/Analysis';
+
+
+
+
+
+%% Set General Analysis Parameters Structure
+InputParam = struct(  'Directory4MUIRData',Directory4MUIRData,      ...
+                      'SelectedDateChar', SelectedDateChar,         ...
+                      'ExpNumberChar',ExpNumberChar,                ...
+                      'SaveFigExt', SaveFigExt,                     ...                       
+                      'PulseType',PulseType,                        ...
+                      'SaveDirectory',SaveDirectory);
+                  
+%% Select data files to be analyzed
+GenParam.SelectedDirChar = [ InputParam.SelectedDateChar , '.'      ...
+                           , InputParam.ExpNumberChar ];                  
+                  
+%% Generate File List 
+[ GenParam status ] = func_MakeFileNameArr(InputParam, GenParam);
+if status < 0, return, end
+    
+
+
+
+%% Select file number for analysis
+[ GenParam ] = func_SelectFileNumber4Ana(GenParam);
+
+
+
+%% Time factor for integration
+[ GenParam ] = func_SelectAnalysisParameters(GenParam, RadarParam);
+
+
+
+
+else
+%% Parse GenerlaParmaters.txt
+    
+    %%%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH    
+    %%% Set Paramaters from text file GeneralParamaters.txt    
+    %%%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH 
+    [ InputParam, status ] = func_InputGeneralAnalysisParameters(       ...
+                                    Directory4GeneralParamsAsciiFile    ...
+                                  , InputParam);
+                              
+    if InputParam.DataFileNumbers < 0
+        InputParam.DataFileNumbers = SelFileNumInput;
+    end
+    
+    if status < 0; return; end
+    %% Select data files to be analyzed
+    GenParam.SelectedDirChar = [ InputParam.SelectedDateChar , '.'      ...
+                               , InputParam.ExpNumberChar ];                  
+
+    %% Generate File List 
+    [ GenParam ] = func_MakeFileNameArr(InputParam, GenParam);
+    
+    Fit = [];
+    for ii = 1:1:length(InputParam.DataFileNumbers)
+        Fit(ii) = find( GenParam.DataFileNumberArr == ...
+                            InputParam.DataFileNumbers(ii) );
+    end
+    
+    GenParam.SelectedFileNames   = GenParam.FileNameArr(Fit);
+    GenParam.SelectedFileNumbers = GenParam.DataFileNumberArr(Fit);
+
+    GenParam.Factor4IntTime = InputParam.Factor4IntTime; 
+
+    GenParam.LowerHeight = InputParam.LowerRange;
+    GenParam.UpperHeight = InputParam.UpperRange;
+                     
+
+end%% if ~RunFromScript
+
+%% Read timing info from selected *.h5 file 
+
+[ RadarParam status] = func_ReadExpSetupFile_hdf5(...
+    InputParam, RadarParam, GenParam);                       
+if status < 0, return, end
+
+
+%% Spectrum analysis of SRIRx data
+[ SavedData ] = func_SpectrumAna4SRIRx(GenParam, InputParam, RadarParam);
+
+
+
+
+
+
+##### SOURCE END #####
+-->
+   </body>
+</html>

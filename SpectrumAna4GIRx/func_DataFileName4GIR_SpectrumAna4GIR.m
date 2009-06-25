@@ -22,6 +22,6 @@ function func_DataFileName4GIR_SpectrumAna4GIR(bit)
  SelDateChar        = num2str(SelDate);
  SelDataNumChar     = num2str(SelDataNum4GIR);
  SelDataExtChar     = num2str(SelDataExtNum4GIR(bit));
- SelDataExtChar     = func_CheckCharLength( SelDataExtChar, 7, '0' );
+ SelDataExtChar     = func_CheckCharLength( SelDataExtChar, 2, '0' );
  DataFileName4GIR   = [ DataDirectory4GIR, SelDateChar, filesep, ...
                         SelDataNumChar, '.', SelDataExtChar, '.dat' ];

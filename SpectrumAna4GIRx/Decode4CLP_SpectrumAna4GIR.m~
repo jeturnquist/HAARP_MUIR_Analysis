@@ -20,6 +20,19 @@
 %------
  global_SpectrumAna4GIR;
  
+
+%------
+% Rx Input Paramters: User defined 
+%------
+
+FitChannel4IL   = 2; %%Ionline
+FitChannel4UPL  = 1; %%Upshifted Plasma Line 
+FitChannel4DPL  = 3; %%Downshifted Plasma Line
+
+CH_FREQ     = cell(3,1);
+CH_FREQ{FitChannel4IL}  = 21000000; %(Hz) Ion line
+CH_FREQ{FitChannel4UPL} = 26800000; %(Hz) Upshifted Plamsa Line
+CH_FREQ{FitChannel4DPL} = 15200000; %(Hz) Downshifted Plamsa line 
  
 %------
 % set general parameters
@@ -330,9 +343,9 @@ h1 =  figure( 'Position', [ 100 100 600 800 ] );
 %%
 %% Power: color-coded time-range profile
 %%
- figure( 'Position', [ 100 100 600 800 ] )
- func_PlotPower4CLP_SpectrumAna4GIR(                                ...
-     years, months, days, hours, minutes, seconds, nseconds, ...
-     PowerArr1, PowerArr2, PowerArr3,                               ...
-     Noise4Power1, Noise4Power2, Noise4Power3,                      ...
-     RangeArr1 );
+%  figure( 'Position', [ 100 100 600 800 ] )
+%  func_PlotPower4CLP_SpectrumAna4GIR(                                ...
+%      years, months, days, hours, minutes, seconds, nseconds, ...
+%      PowerArr1, PowerArr2, PowerArr3,                               ...
+%      Noise4Power1, Noise4Power2, Noise4Power3,                      ...
+%      RangeArr1 );

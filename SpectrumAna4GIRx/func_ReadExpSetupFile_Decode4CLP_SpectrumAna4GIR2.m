@@ -7,6 +7,7 @@
 %
 %        ( ver.1.0: Aug-26-2008: copy from func_ReadExpSetupFile_Decode4CLP_SpectrumAna4GIR )
 %          ver.1.1: 01-Nov-2008 : No longer OS depenent 
+%          ver.2.0: 24-jun-2009: Now uses SRIRx HDF5 file format 
 %
 %          read timing unit files that are not tab deliminated
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -19,8 +20,139 @@ function func_ReadExpSetupFile_Decode4CLP_SpectrumAna4GIR2
 %------
  global_SpectrumAna4GIR;
  
-
+% %======
+% % sampling rate
+% %======
+% %------
+% % file name
+% %------
+% %%
+% %% directory
+% %%
+%  DirectoryChar    = [ DataDirectory4SRIR, filesep, char(SelDataNum4SRIR), filesep ];
+%  
+%  
+% %%
+% %% execute the command and return results
+% %%
+%  [ CommandResults ] = dir( [DirectoryChar, '*.h5'] );
+%
+%   %%% check first result to see if its a Linux hidden file
+%  if strcmp(CommandResults(1).name(1), '.')
+%      ii = 2;
+%  else
+%      ii = 1;
+%  end
+%  
+% 
+% %%
+% %% file name
+% %%
+%  FileNameChar  = [ DirectoryChar, CommandResults(ii).name ];
+%  
+% 
+% %------
+% % get information
+% %------
+% 
+% %%% get the sample time
+% SampleTime = cast( hdf5read( FileNameChar,...
+%                                       '/Rx/SampleTime'), 'double');               
+% 
+% %%% get Pulse Length
+% % PulseLength           : pulse length (micro-second)
+% PulseLength = floor(cast( hdf5read(FileNameChar,...
+%                               '/Raw11/Data/Pulsewidth'), 'double')*1e6);
+% 
+% %%% get Center Frequency                          
+% CenterFreqFromRadarFreq = hdf5read( FileNameChar,...
+%                             '/Rx/TuningFrequency')';                          
+% 
+% %======
+% % from TUF file
+% %======
+% tufile = hdf5read(FileNameChar,'/Setup/Tufile');
+% tufstr = tufile.data;
+% 
+% %%% Generate character array from string
+% newlines = regexp(tufstr, '\n');
+% idx = 1;
+% tufCharArr = [];
+% for ii = 1:length(newlines)
+%     tmpLine = tufstr(idx+1:newlines(ii)-1);
+%     idx = newlines(ii);
+%     tufCharArr = strvcat(tufCharArr, tmpLine);
+% end
+% 
+% 
+% %% Pick up transmiter start time from timing unit file
+% BitChar = strmatch('-2', tufCharArr);   
+% tmpLineArr = tufCharArr(BitChar,:);
+% TxStartChar = [];
+% for ii = 1:length(BitChar)
+%     tmp = findstr(tmpLineArr(ii,:), 'Tx profile 1');
+%     if ~isempty(tmp)
+%         TxStartChar = [TxStartChar; tmpLineArr(ii,6:8)];
+%     end   
+% end
+% 
+% StartTime4Tx = str2num(TxStartChar);
+% 
+% 
+% %% Inter  Pulse Period (IPP)
+% BitChar = strmatch('-1', tufCharArr);
+% IPPChar = strvcat(tufCharArr(BitChar,11:16));
+% IPP = str2num(IPPChar);
+% 
+% 
+% %% start time of sampling
+% BitChar = strmatch(' 7', tufCharArr);
+% RxStartChar = strvcat(tufCharArr(BitChar,6:8));
+% StartTime4Rx  = str2num(RxStartChar);
+%  
+% %% Read random phase coding 
+% PhaseCoding ] = func_GetPhaseCodingGIRx( DirectoryChar )
+% 
+% %======
+% % beam number
+% %======
+% 
+% %------
+% % file name
+% %------
+%  BeamCodes = hdf5read( FileNameChar,...
+%                             '/Raw11/Data/Beamcodes');
+%  BeamDir = func_BeamCode2AzEl(BeamCodes);
+%  
+%  %%% beam number
+%  BeamNum    = length(BeamDir);
+%  
+% 
+% %======
+% % Down Converter Knob
+% %======
+%  expfile = hdf5read( FileNameChar,...
+%                             '/Setup/Experimentfile'); 
+%  
+%                         
+% expstr = expfile.data;
+% 
+% %%% Generate character array from string
+% newlines = regexp(expstr, '\n');
+% idx = 1;
+% expCharArr = [];
+% for ii = 1:length(newlines)
+%     tmpLine = expstr(idx+1:newlines(ii)-1);
+%     idx = newlines(ii);
+%     expCharArr = strvcat(expCharArr, tmpLine);
+% end
+% 
+% %%% get information & search the line including the value
+%  BitChar = strmatch('RxBand', expCharArr);
+%  DCKNum = str2num(expCharArr(BitChar, 8:end));
  
+%% Old routine
+
 %======
 % sampling rate
 %======
@@ -30,19 +162,24 @@ function func_ReadExpSetupFile_Decode4CLP_SpectrumAna4GIR2
 %%
 %% directory
 %%
- DirectoryChar    = [ DataDirectory4SRIR, char(SelDataNum4SRIR), ...
+ DirectoryChar    = [ DataDirectory4SRIR, filesep, char(SelDataNum4SRIR), ...
                       filesep, 'Setup', filesep ];
  
 %%
 %% execute the command and return results
 %%
  [ CommandResults ] = dir( [DirectoryChar, '*.fco'] );
- 
+ %%% check first result to see if its a Linux hidden file
+ if strcmp(CommandResults(1).name(1), '.')
+     ii = 2;
+ else
+     ii = 1;
+ end
 
 %%
 %% file name
 %%
- FileNameChar  = [ DirectoryChar, CommandResults.name ];
+ FileNameChar  = [ DirectoryChar, CommandResults(ii).name ];
  
 
 %------
@@ -84,12 +221,17 @@ function func_ReadExpSetupFile_Decode4CLP_SpectrumAna4GIR2
 %% execute the command and return results
 %%
  [ CommandResults ] = dir( [DirectoryChar,'*.tuf'] );
- 
+  %%% check first result to see if its a Linux hidden file
+ if strcmp(CommandResults(1).name(1), '.')
+     ii = 2;
+ else
+     ii = 1;
+ end
  
 %%
 %% file name
 %%
- FileNameChar  = [ DirectoryChar, CommandResults.name ];
+ FileNameChar  = [ DirectoryChar, CommandResults(ii).name ];
  
  
  
@@ -174,20 +316,25 @@ StartTime4Rx = str2num(TmpLine(idx,FitPos(2):FitPos(2)+FitSpace(1)));
  
  
  
-%======
+% ======
 % beam number
-%======
+% ======
 
-%------
+% ------
 % file name
-%------
+% ------
  
 %%% execute the command and return results
  [ CommandResults ] = dir( [ DirectoryChar, '*.bco' ] );
- 
+  %%% check first result to see if its a Linux hidden file
+ if strcmp(CommandResults(1).name(1), '.')
+     ii = 2;
+ else
+     ii = 1;
+ end
  
 %%% file name
- FileNameChar  = [ DirectoryChar, CommandResults.name ];
+ FileNameChar  = [ DirectoryChar, CommandResults(ii).name ];
  
  %%% open the file
  fid4bco    = fopen( FileNameChar, 'r' );
@@ -201,7 +348,7 @@ StartTime4Rx = str2num(TmpLine(idx,FitPos(2):FitPos(2)+FitSpace(1)));
  while BeamCode ~= -1
       Count4Beam    = Count4Beam + 1;
       BeamDir       = func_BeamCode2AzEl(BeamCodeDec);
-      if BeamDir == 0
+      if BeamDir{:} == 0
           BeamAngleX	= 0;
           BeamAngleY	= 0;
           break
@@ -228,10 +375,15 @@ StartTime4Rx = str2num(TmpLine(idx,FitPos(2):FitPos(2)+FitSpace(1)));
 
 %%% execute the command and return results
  [ CommandResults ] = dir( [ DirectoryChar, '*.exp' ] );
- 
+  %%% check first result to see if its a Linux hidden file
+ if strcmp(CommandResults(1).name(1), '.')
+     ii = 2;
+ else
+     ii = 1;
+ end
  
 %%% file name
- FileNameChar  = [ DirectoryChar, CommandResults.name ];
+ FileNameChar  = [ DirectoryChar, CommandResults(ii).name ];
  
  
 %%% open the file

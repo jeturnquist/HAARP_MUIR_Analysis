@@ -42,4 +42,6 @@ for ii = 1:1:NumBeams
     BeamDir{ii} = [az, el];
 end
 
+if isempty(BeamDir{:}), BeamDir{1} = 0; end
+
 

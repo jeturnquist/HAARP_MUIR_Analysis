@@ -39,6 +39,7 @@ function func_CalRangeOffsetValue_Decode4CLP_SpectrumAna4GIR(du)
 %------
 % search the offset value
 %------
+
  MeanNoiseLevel     = mean(10*log10(dp(1:InitialOffsetDataNumber-2)));
  tmp_dp             = 10*log10(dp) - MeanNoiseLevel;
  idx                = find(tmp_dp < 0);
@@ -46,7 +47,7 @@ function func_CalRangeOffsetValue_Decode4CLP_SpectrumAna4GIR(du)
  ss                 = InitialOffsetDataNumber;
  ee                 = InitialOffsetDataNumber + SearchWidthDataNumber;
  DiffValue          = diff(tmp_dp(ss:ee));
-  TmpThresh          = 10;
+  TmpThresh          = 30;
  FirstLargeValueNum = find( abs(DiffValue) > TmpThresh );
 %  if DiffValue(end) > 0
 %      FirstLargeValueNum = find( DiffValue > MeanNoiseLevel*TmpThresh );

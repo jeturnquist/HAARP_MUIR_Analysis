@@ -50,7 +50,7 @@
 % DataDirectory4GIR =  'I:\2008_Oct_HAARP_campaign\GIRx\oyama_20081101_0145UT\';
 % DataDirectory4GIR= 'I:\2008_Oct_HAARP_campaign\GIRx\pedersen_20081029_0300UT\';
 % DataDirectory4GIR = 'C:\DOCUME~1\jet\MYDOCU~1\Data\GIRx\Oct2008\watkins_2_20081026_100-104_200-204_300-301_GIRx\';
-DataDirectory4GIR = 'H:\Oct2008\GIRx\watkins_20081023_Expt-1_23-24_GIRx\';
+DataDirectory4GIR = '/home/jet/Work/data/GIRx/';
 
 %%%%%%% data from the SRI receiver
 %  DataDirectory4SRIR = 'J:\SRIR\';
@@ -62,10 +62,10 @@ DataDirectory4GIR = 'H:\Oct2008\GIRx\watkins_20081023_Expt-1_23-24_GIRx\';
 %  DataDirectory4SRIR = 'E:\';
 % DataDirectory4SRIR='I:\2008_Oct_HAARP_campaign\SRIRx\Pedersen_20081029_expt2\';
 % DataDirectory4SRIR = 'C:\DOCUME~1\jet\MYDOCU~1\Data\SRIRx\Oct2008\';
-DataDirectory4SRIR = 'H:\Oct2008\SRIRx\';
+DataDirectory4SRIR = '/home/jet/Work/data/SRIRx';
 
 %  SelDate            = 20080730;
- SelDate            = 20081023;
+ SelDate            = 20080224;
  
  
  
@@ -80,7 +80,7 @@ DataDirectory4SRIR = 'H:\Oct2008\SRIRx\';
 %        'C:\Workspace\MUIR_data\' (incorrect)
 %                               ^
  JpgSaveDirectory       = ...
-     'H:\Oct2008\GIRx\watkins_20081023_Expt-1_23-24_GIRx\Analysis';
+     '/home/jet/Work/AnalyzedData';
 %          'C:\DOCUME~1\jet\MYDOCU~1\Analyzed_Data\GIR_data\tmp';
 %      'C:\Workspace\GIR_data';
 

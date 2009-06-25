@@ -20,9 +20,22 @@
 %------
  global_SpectrumAna4GIR;
  
+
+%------
+% Rx Input Paramters: User defined 
+%------
+
+FitChannel4IL   = 2; %%Ionline
+FitChannel4UPL  = 1; %%Upshifted Plasma Line 
+FitChannel4DPL  = 3; %%Downshifted Plasma Line
+
+CH_FREQ     = cell(3,1);
+CH_FREQ{FitChannel4IL}  = 21000000; %(Hz) Ion line
+CH_FREQ{FitChannel4UPL} = 26800000; %(Hz) Upshifted Plamsa Line
+CH_FREQ{FitChannel4DPL} = 15200000; %(Hz) Downshifted Plamsa line 
  
 %------
-% set general parameters
+% set general parameters    
 %------
 % AnaStyle             : 0:use all data files in the selected directory
 %                        1:use a selected data by user
@@ -124,7 +137,8 @@ for Iint = 1:1:CountData
      Tmpyears, Tmpmonths, Tmpdays,                          ...
      Tmphours, Tmpminutes, Tmpseconds, Tmpnseconds, freq ] = ...
      sdrrad2(DataFileName4GIR,0,1);
- 
+  time_idx = cell(1,3);
+  
    for ii = 1:1:3
         idx = find(isnan(du{ii}(:,1)));
         if ~isempty(idx)
@@ -174,15 +188,15 @@ for Iint = 1:1:CountData
     %------
     %%% for the channel 1: Ion Line
      [ FreqArr1 ] = func_CalFreqArr4CLP_SpectrumAna4GIR(...
-         freq{FitChannel4IL});
+         CH_FREQ{FitChannel4IL});
 
     %%% for the channel 2: Upshifted Plasma Line
      [ FreqArr2 ] = func_CalFreqArr4CLP_SpectrumAna4GIR(...
-         freq{FitChannel4UPL});
+         CH_FREQ{FitChannel4UPL});
 
     %%% for the channel 3: Downshifted Plasma Line
      [ FreqArr3 ] = func_CalFreqArr4CLP_SpectrumAna4GIR(...
-         freq{FitChannel4DPL});
+         CH_FREQ{FitChannel4DPL});
 
 
 

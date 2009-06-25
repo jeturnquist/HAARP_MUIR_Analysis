@@ -15,7 +15,7 @@ function [ InputParam, RadarParam, GenParam ] = func_InitializeStructures
 %------
 % set global parameters
 %------
-global_HaarpMUIRAnalysis
+% global_HaarpMUIRAnalysis
 
 %% Initilize empty Input Paramter Structure
 %%

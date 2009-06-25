@@ -13,7 +13,7 @@ function [ GenParam, status ] = func_MakeFileNameArr(InputParam, GenParam)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+  
 status = 1;
 
 DirectoryChar   = fullfile( InputParam.Directory4MUIRData              ...

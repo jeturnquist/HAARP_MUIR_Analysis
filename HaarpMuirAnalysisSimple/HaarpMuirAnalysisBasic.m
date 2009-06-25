@@ -53,7 +53,7 @@ global DCKNOB
 global FREQ_SCALE
 
 
-NODISPLAY       = 1;    %% 0 : figure visible on
+NODISPLAY       = 0;    %% 0 : figure visible on
                         %% 1 : figure visible off 
                     
 RUNFROMSCRIPT   = 0;    %% 1 : Set eqaul to 1 when calling HaarpMUIRAnalysis 
@@ -61,7 +61,7 @@ RUNFROMSCRIPT   = 0;    %% 1 : Set eqaul to 1 when calling HaarpMUIRAnalysis
                         %%      Used when running HaarpMUIRAnalysis on a cluster.
                         %%      See shell script for more info.
 
-RUNALL          = 1;    %% 1 : Use all data files in the directory  
+RUNALL          = 0;    %% 1 : Use all data files in the directory  
                         %% 0 : Select files from directory
                     
 SAVEBIT         = 0;    %% 1 : Store PSD and SNR data in structure SavedData
@@ -126,7 +126,7 @@ if ~RUNFROMSCRIPT
 % Directory4MUIRData =  ...
 %     'H:\FebMarch08WinterCampaign\SRIIRxData';
 Directory4MUIRData =  ...
-    'H:\Oct2008\SRIRx';
+    '/mnt/usb/Oct2008/SRIRx/';
 %     '/Users/jet/Work/Campain_Oct2008';
 
       
@@ -135,7 +135,7 @@ ExpNumberChar       = '004';
 
 
 SaveDirectory = ...
-    'H:\Oct2008\SRIRx\20081023.004\Analysis';
+    '/home/jet/Work/AnalyzedData/';
 %     '/Users/jet/Work/alpha/Pedersen_20081029/SRIRx/Analysis';
 
 

@@ -1,0 +1,61 @@
+function savePlot( fh           ...
+                 , currentData  ...
+                 , genParam     ...
+                 , radarParam   ...
+                 , initParam   ...
+                 , TimeChar )
+                  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       savePlot
+%          made by J. Turnquist, GI UAF
+%
+%          ver.1.0: Aug-7-2008
+%          ver.1.1: Aug-13-2008: Added ablility to save in differant
+%                                   data formats
+%
+%       Save plots to selected directory
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+DirectoryChar = fullfile( initParam.saveDir, initParam.expDate );
+
+%%%
+%%% Check directory tree, if needed make directry tree 
+%%%
+
+CommandChar   = [ 'cd ' DirectoryChar ];
+
+[ status, CommandResults ] = unix( CommandChar );
+
+if status 
+    [ status, CommandResults ] = mkdir( DirectoryChar ); 
+end
+
+
+FileNameChar = [initParam.expDate,'T',TimeChar,'.',initParam.figSaveExt];
+
+SaveDirectoryChar = fullfile(DirectoryChar, FileNameChar);
+
+
+%%% image resolution 
+rgb_size    = size(gcf);
+pos         = get(gcf,'Position');
+scrsz       = get(0,'ScreenSize');
+
+res = ( scrsz(3)*scrsz(4) )*( pos(3)*pos(4) )/( rgb_size(1)*rgb_size(2) );
+
+switch initParam.figSaveExt
+    case {'jpg'}
+        print('-djpeg', SaveDirectoryChar);
+    case {'tif'}
+        print('-dtiff', SaveDirectoryChar);
+    case {'pdf'}
+        print('-dpdf', SaveDirectoryChar);  
+    case {'epd'}
+        print('-deps', SaveDirectoryChar);
+    case {'fig'}
+        saveas(fh, SaveDirectoryChar);
+end

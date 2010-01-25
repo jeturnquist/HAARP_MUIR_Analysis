@@ -47,12 +47,13 @@
 
 global NODISPLAY
 global RUNFROMSCRIPT 
+global RUNALL
 global SAVEBIT
 global DCKNOB
 global FREQ_SCALE
 
 
-NODISPLAY       = 1;    %% 0 : figure visible on
+NODISPLAY       = 0;    %% 0 : figure visible on
                         %% 1 : figure visible off 
                     
 RUNFROMSCRIPT   = 0;    %% 1 : Set eqaul to 1 when calling HaarpMUIRAnalysis 
@@ -60,7 +61,8 @@ RUNFROMSCRIPT   = 0;    %% 1 : Set eqaul to 1 when calling HaarpMUIRAnalysis
                         %%      Used when running HaarpMUIRAnalysis on a cluster.
                         %%      See shell script for more info.
 
-                        
+RUNALL          = 0;    %% 1 : Use all data files in the directory  
+                        %% 0 : Select files from directory
                     
 SAVEBIT         = 0;    %% 1 : Store PSD and SNR data in structure SavedData
                         %% 0 : Do not store data
@@ -70,7 +72,7 @@ DCKNOB          = 445;  %% 445 : Ionline
                         %% 450 : Downshifted plasma line
                         %% 440 : Upshifted plasma line
 
-FREQ_SCALE      = .9;    %% Scale factor for Frequency Axis of PSD Plot
+FREQ_SCALE      = 0;    %% Scale factor for Frequency Axis of PSD Plot
                         %% In effect "zoom" the Frequency Axis
                         %% Decimal values: 0.0-1.0
                         %% 0.0 - use entire frequency scale
@@ -95,7 +97,7 @@ SaveFigExt         = 'jpg';         %% 0   : Do not save figure
                                     %% See help print for other data 
                                     %%  formats
                                     
-PulseType           = 'uCLP';        %% uCLP : Uncoded Long Pulse
+PulseType           = 'CLP';        %% uCLP : Uncoded Long Pulse
                                     %% CLP  : Coded Long Pulse
 
 %% Initialize Parameter Structures
@@ -124,16 +126,17 @@ if ~RUNFROMSCRIPT
 % Directory4MUIRData =  ...
 %     'H:\FebMarch08WinterCampaign\SRIIRxData';
 Directory4MUIRData =  ...
+    'C:\Documents and Settings\jet\My Documents\Data\SRIRx\Oct2008'
     'H:\Oct2008\SRIRx';
 %     '/Users/jet/Work/Campain_Oct2008';
 
       
-SelectedDateChar    = '20081026';
-ExpNumberChar       = '020';
+SelectedDateChar    = '20081024';
+ExpNumberChar       = '001';
 
 
 SaveDirectory = ...
-    'H:\Oct2008\SRIRx\20081026.020\Analysis';
+    'H:\Oct2008\SRIRx\20081024.001\Analysis\tmp4';
 %     '/Users/jet/Work/alpha/Pedersen_20081029/SRIRx/Analysis';
 
 

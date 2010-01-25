@@ -78,8 +78,13 @@ for beam_idx = 1:1:size(CurrentData.BeamCodes,1)
     %% Build frequency array
     FreqArr     = CurrentData.FreqArr;
     len         = length(FreqArr);
-    FreqWidth   = ceil((len/2)*FREQ_SCALE); %% Half width of frequency, scale is a percent
-    FreqArr     = FreqArr(FreqWidth:end-FreqWidth);
+    if FREQ_SCALE
+        FreqWidth(1:2)   = ceil((len/2)*FREQ_SCALE); %% Half width of frequency, scale is a percent
+        FreqArr     = FreqArr(FreqWidth:end-FreqWidth);
+    else
+        FreqWidth(1) = 1;
+        FreqWidth(2) = 0;
+    end
     FreqTick    = FreqArr(1:100:end);
 
     %% Plot SNR and PSD as subplots 
@@ -147,7 +152,7 @@ for beam_idx = 1:1:size(CurrentData.BeamCodes,1)
     subplot(2,1,2);
 
     imagen(TickArr, FreqArr, ...
-            CurrentData.PSDinDBArr{beam_idx}(FreqWidth:end-FreqWidth, :));
+            CurrentData.PSDinDBArr{beam_idx}(FreqWidth(1):end-FreqWidth(2), :));
 
     %%% x-axis
 %     set(gca, 'XTick', [0:100:length(CurrentData.du_sorted{beam_idx})]);

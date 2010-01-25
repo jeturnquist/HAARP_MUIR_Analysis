@@ -47,4 +47,7 @@ if strcmp(InputParam.PulseType, 'CLP')
     [RadarParam] = func_GetPhaseCoding( GenParam       ...
                                       , RadarParam      ...
                                       , InputParam);
+
+    tmp = zeros(1,124);
+    RadarParam.PhaseCoding = [ tmp, RadarParam.PhaseCoding(125:end) ];                                
 end%if PulseType

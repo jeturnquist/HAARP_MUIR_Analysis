@@ -17,12 +17,10 @@ function func_PlotPSDvsRange4IntPeriod_CLP( CurrentData     ...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%------
-% set global parameters
-%------
-% global_HaarpMUIRAnalysis;
 global NODISPLAY
 global RUNFROMSCRIPT
+global FREQ_SCALE  %%scale the half frequency width by percentage 
+
 
 for Iint = 1:1:length(CurrentData.PSDArr{1})
     f(Iint) = figure(Iint);
@@ -34,34 +32,6 @@ for Iint = 1:1:length(CurrentData.PSDArr{1})
     for beam_idx = 1:1:size(CurrentData.BeamCodes,1) 
 
         %% Build time array
-%         HH = CurrentData.TimeArrOfHour{beam_idx};
-%         MM = CurrentData.TimeArrOfMinute{beam_idx};
-%         SS = CurrentData.TimeArrOfSecond{beam_idx};
-% 
-%         TimeInSeconds = HH(1)*3600 + MM(1)*60 + SS(1);
-% 
-%         TickSpacing = RadarParam.IPP(1)/1e4;
-%         TickArr = (0:TickSpacing:length(CurrentData.du_sorted{1}))  ...
-%             * size(CurrentData.BeamCodes,1)/1e2;
-% 
-% 
-%         time_idx = GenParam.TimeIdx;
-% 
-%         if time_idx 
-%             TickArr = TickArr(time_idx);
-%         end
-% 
-%         TickSpacing = floor(length(TickArr)/20);
-%         TickSpacing = 1;
-%         TimeTick = TickArr(1:TickSpacing:end);
-% 
-%         StartTime = TimeInSeconds + ...
-%                         TickArr((Iint-1)*GenParam.Factor4IntTime+1);
-%         StartTimeStruct = sec2struct(StartTime);
-%         StartTimeChar = StartTimeStruct.str;
-
- 
-        %% Build time array
         l = size(CurrentData.TimeArrOfHour{1});
 
         HH = reshape(CurrentData.TimeArrOfHour{1},l(1)*l(2),1);
@@ -70,23 +40,15 @@ for Iint = 1:1:length(CurrentData.PSDArr{1})
 
         TimeInSeconds = HH*3600 + MM*60 + SS;
 
-    %     TickSpacing = RadarParam.IPP(1)/1e4;
-    %     TickArr = (0:TickSpacing:length(CurrentData.du_sorted{1}))...
-    %         * size(CurrentData.BeamCodes,1)/1e2;
-
         time_idx = GenParam.TimeIdx;
 
         if time_idx 
-            TickArr = TimeInSeconds(time_idx)-TimeInSeconds(1);
+            StartTime = TimeInSeconds(time_idx);
+            StartTime = StartTime((Iint-1)*GenParam.Factor4IntTime+1);
         else
-            TickArr = TimeInSeconds - TimeInSeconds(1);
+            StartTime = TimeInSeconds((Iint-1)*GenParam.Factor4IntTime+1);
         end
 
-    %     TickSpacing = floor(length(TickArr)/20);
-    %     TickSpacing = 1;
-    %     TimeTick = TickArr(1:TickSpacing:end);
-
-        StartTime = TimeInSeconds(1);
         StartTimeStruct = sec2struct(StartTime);
         StartTimeChar = StartTimeStruct.str;
 
@@ -112,7 +74,15 @@ for Iint = 1:1:length(CurrentData.PSDArr{1})
 
         %% Build frequency array
         FreqArr   = CurrentData.FreqArr;
-        FreqTick  = FreqArr(1:100:end);
+        len         = length(FreqArr);
+        if FREQ_SCALE
+            FreqWidth(1:2)   = ceil((len/2)*FREQ_SCALE); %% Half width of frequency, scale is a percent
+            FreqArr     = FreqArr(FreqWidth:end-FreqWidth);
+        else
+            FreqWidth(1) = 1;
+            FreqWidth(2) = 0;
+        end
+        FreqTick    = FreqArr(1:100:end);
 
 
         %%%---------
@@ -120,7 +90,7 @@ for Iint = 1:1:length(CurrentData.PSDArr{1})
         %%%---------
 
         imagen(FreqArr, CurrentData.Range(rng_idx).* AltCorr, ...
-                CurrentData.PSDinDBArr{beam_idx}{Iint}');
+                CurrentData.PSDinDBArr{beam_idx}{Iint}(FreqWidth(1):end-FreqWidth(2), :)');
 
         %%% x-axis
     %     set(gca, 'XTick', [0:100:length(CurrentData.du_sorted{beam_idx})]);
@@ -139,9 +109,13 @@ for Iint = 1:1:length(CurrentData.PSDArr{1})
             sd = [FileChar(end-27:end-16), tmpchar];
         end
         
+        IntegartionTimeChar = num2str(GenParam.Factor4IntTime* ...
+            RadarParam.IPP*1e-3);
+        
         title({['\bf\fontsize{12}Selected Data: ', sd]; ...
                ['\bf\fontsize{10}Power Spectral Density (dB)    Time: ', ...
-                 StartTimeChar,' UT']})
+                 StartTimeChar,' UT', '   Integration: ' ...
+                 , IntegartionTimeChar, ' (ms)']})
         xlabel(['Frequency Offset (MHz)']);
 
         %%% Firs y-axis: Range (km)
@@ -150,7 +124,7 @@ for Iint = 1:1:length(CurrentData.PSDArr{1})
         ylabel({['Altitude (km)'];['']});
         colormap(jet);
         colorbar('location', 'eastoutside');    
-        caxis([30 50]);
+        caxis([40 50]);
 
         %%% Second y-axis; Altitude; range corrected for beam elevation (km)     
         ax(1) = gca(f(Iint));

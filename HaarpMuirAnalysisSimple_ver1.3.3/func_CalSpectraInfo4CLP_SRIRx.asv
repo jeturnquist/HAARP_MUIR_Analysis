@@ -9,14 +9,15 @@ function [ CurrentData ] = func_CalSpectraInfo4CLP_SRIRx(...
 %          made by J. Tunrquist, GI UAF
 %
 %          ver.1.0: July-9-2008
-%           
+%          ver.1.1: Jan-10-2009: fixed frequency offset
+%          ver.1.2: Jan-29-2009: function mean2 deprecated in MATLAB 2008
 %
 %       Perform spectrum analysis on selected data sets for coded long
 %       pulse data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+global DCKNOB
                           
 c       = 2.99792458e8;    
 bit = 0;
@@ -141,18 +142,10 @@ FreqWidth = RadarParam.SamplingRate; %Hz
 TransFreq = RadarParam.TransmitFreq; %Hz
 RecCenterFreq   = RadarParam.ReceivingCenterFrequency(1);  %Hz
 
-
-if RecCenterFreq > 21e6
-    fDK = 440;
-elseif RecCenterFreq == 21e6
-    fDK = 445;
-elseif RecCenterFreq < 21e6
-    fDK = 450;
-end
-
 RadarFreq = 446;
 
-fHF = RecCenterFreq/1e6 - 21;
+% fHF = RecCenterFreq/1e6 - 21;
+fHF = RecCenterFreq/1e6 - 446 - 20 + DCKNOB;
 
 CenterFreq = fHF;
 FreqRes = FreqWidth/FitRange;
@@ -160,6 +153,11 @@ FreqArr = FreqRes:FreqRes:FreqWidth;
 FreqArr = FreqArr - FreqWidth/2;
 
 CurrentData.FreqArr = FreqArr/1e3 + CenterFreq;
+
+%%
+%% Calculate Background Noise
+%%
+
 
 clear PSDArr
 clear PSDinDBArr

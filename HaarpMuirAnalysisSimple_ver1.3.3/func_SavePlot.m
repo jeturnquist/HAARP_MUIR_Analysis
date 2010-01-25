@@ -35,7 +35,7 @@ if status
 end
 
 TmpChar = datestr(CurrentData.MatlabTime(1,1),30);
-FileNameChar = [TmpChar,'.',TimeChar,'.',InputParam.SaveFigExt];
+FileNameChar = [TmpChar(1:end-6), TimeChar,'.',InputParam.SaveFigExt];
 
 SaveDirectoryChar = fullfile(DirectoryChar, FileNameChar);
 

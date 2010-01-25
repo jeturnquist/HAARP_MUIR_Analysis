@@ -113,9 +113,11 @@ for Ifile = 1:1:IfileNum
       SavedData.(FileName).TimeArrOfHour    = CurrentData.TimeArrOfHour;
       SavedData.(FileName).TimeArrOfMinute  = CurrentData.TimeArrOfMinute;
       SavedData.(FileName).TimeArrOfSecond  = CurrentData.TimeArrOfSecond;
+      SavedData.(FileName).FreqArr          = CurrentData.FreqArr;
+      SavedData.(FileName).Range            = CurrentData.Range;
     else
         SavedData = [];
-      
+        clear java
     end%% RUNFROMSCRIPT
                                 
 end% for Ifile                                

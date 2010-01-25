@@ -17,7 +17,7 @@ function [ CurrentData ] = func_CalSpectraInfo4CLP_SRIRx(...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+global DCKNOB
                           
 c       = 2.99792458e8;    
 bit = 0;
@@ -105,16 +105,20 @@ for beam_idx = 1:1:NumBeams(1)
 
             %% Calculate Power Spectral Density
 %             tmp_psd = fft(decoded_du);
-            tmp_psd = fftshift(fft(decoded_du));
+            tmp_psd = flipud(fftshift(fft(decoded_du)));
             tmp_psd = tmp_psd.*conj(tmp_psd);
-            
+%            tmp_psd = tmp_psd./repmat(sum(tmp_psd),size(tmp_psd,1),1);
             tmp_psd = mean(tmp_psd,2);
+%             relmax = sum(tmp_psd)./max(tmp_psd);
+%             tmp_psd = tmp_psd./relmax;
             PSD(:,irange - ssRng + 1) = tmp_psd;
             
         end% for irange 
 
 %         idx = find(PSD <= 0);
 %         PSD(idx) = thresh;
+%         maxPSD = max(max(PSD));
+%         PSD = PSD./repmat(abs(maxPSD - sum(PSD,1)), size(PSD,1),1);
         psd_db = 10*log10(PSD);
 
 
@@ -136,7 +140,7 @@ CurrentData.PSDinDBArr  = PSDinDBArr;
 %%
 %% Create Frequency Array
 %%
-FitRange = size(PSDArr{1},1);
+FitRange = length(PSDArr{1}{1});
 
 FreqWidth = RadarParam.SamplingRate; %Hz
 TransFreq = RadarParam.TransmitFreq; %Hz
@@ -149,10 +153,15 @@ fHF = RecCenterFreq/1e6 - 446 - 20 + DCKNOB;
 
 CenterFreq = fHF;
 FreqRes = FreqWidth/FitRange;
-FreqArr = FreqRes:FreqRes:FreqWidth;
-FreqArr = FreqArr - FreqWidth/2;
+FreqArr = 0:FreqRes:FreqWidth-1;
+FreqArr = FreqArr - FreqArr(end)/2;
 
 CurrentData.FreqArr = FreqArr/1e3 + CenterFreq;
+
+%%
+%% Calculate Background Noise
+%%
+
 
 clear PSDArr
 clear PSDinDBArr

@@ -53,15 +53,15 @@ global DCKNOB
 global FREQ_SCALE
 
 
-NODISPLAY       = 0;    %% 0 : figure visible on
+NODISPLAY       = 1;    %% 0 : figure visible on
                         %% 1 : figure visible off 
                     
 RUNFROMSCRIPT   = 0;    %% 1 : Set eqaul to 1 when calling HaarpMUIRAnalysis 
-                        %%      as a function from from a shell script. 
+                        %%     629 as a function from from a shell script. 
                         %%      Used when running HaarpMUIRAnalysis on a cluster.
                         %%      See shell script for more info.
 
-RUNALL          = 0;    %% 1 : Use all data files in the directory  
+RUNALL          = 1;    %% 1 : Use all data files in the directory  
                         %% 0 : Select files from directory
                     
 SAVEBIT         = 0;    %% 1 : Store PSD and SNR data in structure SavedData
@@ -72,7 +72,7 @@ DCKNOB          = 445;  %% 445 : Ionline
                         %% 450 : Downshifted plasma line
                         %% 440 : Upshifted plasma line
 
-FREQ_SCALE      = .9;    %% Scale factor for Frequency Axis of PSD Plot
+FREQ_SCALE      = 0;    %% Scale factor for Frequency Axis of PSD Plot
                         %% In effect "zoom" the Frequency Axis
                         %% Decimal values: 0.0-1.0
                         %% 0.0 - use entire frequency scale
@@ -97,7 +97,7 @@ SaveFigExt         = 'jpg';         %% 0   : Do not save figure
                                     %% See help print for other data 
                                     %%  formats
                                     
-PulseType           = 'uCLP';        %% uCLP : Uncoded Long Pulse
+PulseType           = 'CLP';        %% uCLP : Uncoded Long Pulse
                                     %% CLP  : Coded Long Pulse
 
 %% Initialize Parameter Structures
@@ -117,7 +117,7 @@ if ~RUNFROMSCRIPT
 %         Thus, either place the data in a directory path containing no
 %       spaces or use the windows short name convention.
 %           'C:\Documents and Settings' --> 'C:\DOCUME~1' (short name)
-%
+% 
 %         On a *nix system it is possible to escape spaces using a
 %       backslash (\).
 %            '/PARS summer school 2007' --> '/PARS\ summer\ school\ 2007'
@@ -126,16 +126,24 @@ if ~RUNFROMSCRIPT
 % Directory4MUIRData =  ...
 %     'H:\FebMarch08WinterCampaign\SRIIRxData';
 Directory4MUIRData =  ...
-    '/Volumes/Dragon-100/Oct2008/SRIRx/';
+    '/Volumes/MYBOOK/DATA_SRI-Rx_August2009campaign/NRL-2/'
+%     '/media/MYBOOK/DATA_SRI-Rx_August2009campaign/nrl-2/'
+%     '/usr/local/work/data/Oct2008/'
+%     'C:\DOCUME~1\jet\MYDOCU~1\Data\SRIRx\Oct2008'
+%     'H:\Oct2008\SRIRx';
 %     '/Users/jet/Work/Campain_Oct2008';
 
       
-SelectedDateChar    = '20081023';
-ExpNumberChar       = '004';
+SelectedDateChar    = '20090812';
+ExpNumberChar       = '002';
 
 
 SaveDirectory = ...
-    '~/Work/AnalyzedData/';
+    '/Volumes/MYBOOK/DATA_SRI-Rx_August2009campaign/NRL-2/Analyzed/tmp'
+%     '/media/MYBOOK/DATA_SRI-Rx_August2009campaign/nrl-2/Analyzed/tmp/tmp'
+%     '/usr/local/work/data/Oct2008/20081024.001/Analyzed/tmp';
+%     'C:\Documents and Settings\jet\My Documents\Analyzed_Data\MUIR_data\20081024.001\data';
+%     'H:\Oct2008\SRIRx\20081024.001\Analysis\tmp4';
 %     '/Users/jet/Work/alpha/Pedersen_20081029/SRIRx/Analysis';
 
 
